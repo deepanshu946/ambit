@@ -33,7 +33,10 @@ final class AppModel {
         self.historyStore = historyStore
         self.acknowledgementStore = acknowledgementStore
         acknowledged = acknowledgementStore.load() ?? [:]
-        modes = modeStore.load() ?? DefaultModes.all
+        let saved = modeStore.load()
+        let merged = saved.map(DefaultModes.addingMissing(to:)) ?? DefaultModes.all      // new starter modes appear for existing users
+        modes = merged
+        if let saved, merged.count != saved.count { try? modeStore.save(merged) }
         history = historyStore.load() ?? []
         effects.onNotice = { [weak self] text in
             guard let self else { return }

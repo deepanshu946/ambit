@@ -66,9 +66,19 @@ private func at(_ s: TimeInterval) -> Date { t0.addingTimeInterval(s) }
         #expect(SessionRecord.shouldRecord(elapsed: 5))
     }
 
-    @Test func defaultModesAreSevenWithUniqueIDs() {
-        #expect(DefaultModes.all.count == 7)
-        #expect(Set(DefaultModes.all.map(\.id)).count == 7)
+    @Test func defaultModesAreEightWithUniqueIDs() {
+        #expect(DefaultModes.all.count == 8)
+        #expect(Set(DefaultModes.all.map(\.id)).count == 8)
+    }
+
+    @Test func aSavedListFromBeforeMusicExistedGetsMusicAndKeepsItsEdits() {
+        var saved = Array(DefaultModes.all.prefix(7))          // the 7 modes that shipped first
+        saved[0].name = "My Deep Work"
+        saved[0].system.outputVolume = 0.9
+        let merged = DefaultModes.addingMissing(to: saved)
+        #expect(merged.count == 8 && merged.last?.name == "Music")
+        #expect(merged[0].name == "My Deep Work" && merged[0].system.outputVolume == 0.9)
+        #expect(DefaultModes.addingMissing(to: merged) == merged)       // nothing to add the second time
     }
 
     @Test func oldFileMissingNewFieldsStillDecodes() throws {
@@ -126,7 +136,7 @@ private func at(_ s: TimeInterval) -> Date { t0.addingTimeInterval(s) }
     @Test func everyDefaultModeWallpaperExistsInManifest() throws {
         let ids = Set(try entries().map(\.id))
         for mode in DefaultModes.all {
-            guard case .bundled(let id) = mode.wallpaper else { Issue.record("\(mode.name) has no wallpaper"); continue }
+            guard case .bundled(let id) = mode.wallpaper else { continue }       // .keep (Music) leaves the desktop alone
             #expect(ids.contains(id), "\(mode.name) → \(id)")
         }
     }

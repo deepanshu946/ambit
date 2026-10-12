@@ -19,15 +19,25 @@ public enum DefaultModes {
              "video", .light, RGB(0.18, 0.71, 0.34), [.timer, .priorities, .quickNote], hide: ["com.tinyspeck.slackmacgap"]),
         mode("00000000-0000-0000-0000-000000000007", "Creative", "Energetic. Big canvas, tools in reach.",
              "paintpalette", .dark, RGB(1.00, 0.31, 0.64), [.timer, .priorities, .sound, .quickNote], dock: true),
+        mode("00000000-0000-0000-0000-000000000008", "Music", "Your music, always one glance away.",
+             "music.note", .system, RGB(0.62, 0.40, 0.98), [.sound]),
     ]
 
-    /// First wallpaper of each mode in Wallpapers/manifest.json, in the same order as `presets`.
-    private static let firstWallpaper = ["deep-1", "study-1", "plan-1", "browse-1", "chill-1", "meeting-1", "creative-1"]
+    /// First wallpaper of each mode in Wallpapers/manifest.json, in the same order as `presets`. nil leaves the desktop alone
+    /// (Music is about the player, not the desktop).
+    private static let firstWallpaper: [String?] = ["deep-1", "study-1", "plan-1", "browse-1", "chill-1", "meeting-1", "creative-1", nil]
 
     public static let all: [Mode] = zip(presets, firstWallpaper).map { mode, id in
         var mode = mode
-        mode.wallpaper = .bundled(id: id)
+        if let id { mode.wallpaper = .bundled(id: id) }
         return mode
+    }
+
+    /// A saved list from before a starter mode existed gets that mode appended; everything already saved, including
+    /// the person's edits, is left exactly as it is. (Revisit when modes can be deleted, or a deleted one would return.)
+    public static func addingMissing(to saved: [Mode]) -> [Mode] {
+        let known = Set(saved.map(\.id))
+        return saved + all.filter { !known.contains($0.id) }
     }
 
     private static func mode(

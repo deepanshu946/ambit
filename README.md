@@ -2,7 +2,7 @@
 
 > **Git is the source of truth for this project.** The repository on GitHub (`deepanshu946/flow`) holds the real, current code and docs. Everything is committed and pushed there; any copy on a laptop is a working copy. If a copy and the repository disagree, the repository wins.
 
-Create the environment you want to work in. A native macOS app: pick a mode (Deep Work, Study, Plan, Browse, Chill, Meeting, Creative) and Flow shapes your Mac around it.
+Create the environment you want to work in. A native macOS app: pick a mode (Deep Work, Study, Plan, Browse, Chill, Meeting, Creative, Music) and Flow shapes your Mac around it.
 
 **Status:** early. Modes are editable (wallpaper gallery, apps to hide or open, Dock, volume, Focus shortcut, look) and sessions are timed and recorded. Starting a session changes your Mac and ending it puts everything back: wallpaper, light/dark appearance, Dock auto-hide, volume, hidden apps, opened apps, and a Focus (through your own shortcuts).
 
@@ -43,7 +43,7 @@ Every change follows the same rules, in code and in tests: it is saved to disk *
 - **Live tests (Debug builds):** `FLOW_SELFTEST=wallpaper|apps|events`. Launch with `open -n --env ...` so macOS treats Flow, not your shell, as the app asking for permission.
 
 ## Development
-- **Workflow:** one feature at a time. A feature is built, compiled and unit-tested, then handed to the owner, who tests it in the real app and sends review notes. Fixes and the next feature follow from that review. Nothing is called done until the owner has tried it.
+- **Workflow:** round robin, one mode at a time. Each turn adds one or two features to one mode, then moves to the next mode (plan in [ROADMAP.md](ROADMAP.md)). Within a turn, one feature at a time. A feature is built, compiled and unit-tested, then handed to the owner, who tests it in the real app and sends review notes. Fixes and the next feature follow from that review. Nothing is called done until the owner has tried it.
 - **Commits:** small and described in plain words. `main` is always the latest working state.
 - **Status and plans:** see [ROADMAP.md](ROADMAP.md).
 - **Design skills (optional, not in this repo):** while developing with Claude Code, two MIT-licensed skills were used for macOS design and SwiftUI correctness: [apple-hig](https://github.com/ebuntario/apple-hig) and [swiftui-expert-skill](https://github.com/AvdLee/SwiftUI-Agent-Skill). Install them into `.claude/skills/` if you want the same guidance; that folder is git-ignored.
