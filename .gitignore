@@ -1,0 +1,13 @@
+.DS_Store
+build/
+DerivedData/
+.build/
+.swiftpm/
+*.xcuserstate
+xcuserdata/
+
+# Downloaded 4K wallpapers (Wallpapers/fetch.py recreates them)
+Wallpapers/images/
+
+# Third-party Claude Code skills used while developing; not ours to redistribute. See README > Development.
+.claude/skills/
