@@ -11,7 +11,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 MANIFEST = HERE / "manifest.json"
 IMAGES = HERE / "images"
-UA = {"User-Agent": "FlowMacApp/0.1 (open-source wallpaper fetch; https://github.com/)"}
+UA = {"User-Agent": "AmbitMacApp/0.1 (open-source wallpaper fetch; https://github.com/)"}
 
 def pixel_width(path):
     out = subprocess.run(["sips", "-g", "pixelWidth", str(path)], capture_output=True, text=True).stdout
