@@ -72,6 +72,9 @@ struct ModeCommands: Commands {
             Button(model.clock.isPaused ? "Resume Session" : "Pause Session") { model.togglePause() }
                 .keyboardShortcut("p", modifiers: [.command, .option])
                 .disabled(!model.clock.isActive)
+            Button("Show Notepad") { model.panels.showNotepad() }
+                .keyboardShortcut("n", modifiers: [.command, .option])
+                .disabled(!model.panels.hasNotepad)
             Button("End Session") { model.end() }
                 .keyboardShortcut("e", modifiers: [.command, .option])
                 .disabled(!model.clock.isActive)

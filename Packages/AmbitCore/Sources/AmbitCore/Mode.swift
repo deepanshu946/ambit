@@ -12,15 +12,17 @@ public struct Mode: Identifiable, Codable, Hashable, Sendable {
     public var system: SystemSettings
     public var panel: [PanelComponent]
     public var sound: SoundSetting
+    public var notepad: NotepadSettings
 
     public init(
         id: UUID = UUID(), name: String, tagline: String = "", symbol: String = "circle",
         look: Look = Look(), wallpaper: WallpaperSetting = .keep, system: SystemSettings = SystemSettings(),
-        panel: [PanelComponent] = [.timer, .priorities], sound: SoundSetting = SoundSetting()
+        panel: [PanelComponent] = [.timer, .priorities], sound: SoundSetting = SoundSetting(),
+        notepad: NotepadSettings = NotepadSettings()
     ) {
         self.id = id; self.name = name; self.tagline = tagline; self.symbol = symbol
         self.look = look; self.wallpaper = wallpaper; self.system = system
-        self.panel = panel; self.sound = sound
+        self.panel = panel; self.sound = sound; self.notepad = notepad
     }
 
     // Forgiving decoding: a field missing from an older file falls back to its default.
@@ -35,6 +37,7 @@ public struct Mode: Identifiable, Codable, Hashable, Sendable {
         system = try c.decodeIfPresent(SystemSettings.self, forKey: .system) ?? SystemSettings()
         panel = try c.decodeIfPresent([PanelComponent].self, forKey: .panel) ?? [.timer, .priorities]
         sound = try c.decodeIfPresent(SoundSetting.self, forKey: .sound) ?? SoundSetting()
+        notepad = try c.decodeIfPresent(NotepadSettings.self, forKey: .notepad) ?? NotepadSettings()
     }
 }
 
@@ -71,11 +74,18 @@ public struct SystemSettings: Codable, Hashable, Sendable {
 }
 
 public enum PanelComponent: String, Codable, CaseIterable, Hashable, Sendable {
-    case timer, clock, priorities, sound, quickNote
+    case timer, clock, priorities, sound, quickNote, notepad
 }
 
 public struct SoundSetting: Codable, Hashable, Sendable {
     public var soundscapeID: String?
     public var volume: Double = 0.5
     public init() {}
+}
+
+/// The floating notepad (shown when the mode's panel includes `.notepad`). Notes go to one new note per session.
+public struct NotepadSettings: Codable, Hashable, Sendable {
+    public static let defaultFolder = "Ambit Meetings"
+    public var folder: String = NotepadSettings.defaultFolder
+    public init(folder: String = NotepadSettings.defaultFolder) { self.folder = folder }
 }

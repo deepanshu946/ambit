@@ -70,7 +70,7 @@ struct ModeDetailView: View {
 
             FocusSection(on: $mode.system.focusShortcut, off: $mode.system.focusEndShortcut)
 
-            Section("Session panel") {
+            Section {
                 ForEach(PanelComponent.allCases, id: \.self) { component in
                     Toggle(component.title, isOn: Binding(
                         get: { mode.panel.contains(component) },
@@ -79,6 +79,13 @@ struct ModeDetailView: View {
                             else { mode.panel.removeAll { $0 == component } }
                         }))
                 }
+                if mode.panel.contains(.notepad) {
+                    TextField("Notes folder", text: $mode.notepad.folder, prompt: Text(NotepadSettings.defaultFolder))
+                }
+            } header: {
+                Text("Session panel")
+            } footer: {
+                Text("The notepad opens when the mode starts, docked at the right edge, and you can drag it anywhere. What you type is saved as a new note in the chosen folder in Notes, once per session. The first time, macOS asks whether Ambit may control Notes. The other parts are saved with the mode but have no on-screen panel yet.")
             }
         }
         .formStyle(.grouped)
@@ -214,6 +221,7 @@ extension PanelComponent {
         case .priorities: "Priorities"
         case .sound: "Sound"
         case .quickNote: "Quick note"
+        case .notepad: "Notepad (saves to Notes)"
         }
     }
 }

@@ -37,9 +37,13 @@ We go around the modes in turns. Each turn picks one mode, adds one or two featu
 - No app icon, the bundle identifier is a placeholder, and there is no licence or release pipeline.
 - Window tiling and the macOS accent colour are not implemented.
 
+## Round one, in progress: Meeting
+**Built, waiting for the owner's test:** the floating panel foundation (a draggable panel that floats above windows, follows you across Spaces, tries to sit over full-screen apps, and remembers where you left it) and the Meeting notepad on top of it. The notepad opens docked at the right edge when Meeting starts, can be switched on or off per mode in the editor, and saves into a new note per session in the "Ambit Meetings" folder in Notes (the folder is editable per mode). Text is kept in a local draft until Notes has it, and a draft left by a crash is saved at the next launch. Features added to a starter mode after release reach already-saved modes once (`PresetUpgrades`), so a later "off" is never undone.
+
+**Not yet verified in the real app:** typing into the panel without leaving the call app, appearing over full-screen apps, and the macOS permission to control Notes. Next for Meeting after review: agenda from Calendar, start by itself when an event begins, end-of-meeting prompt.
+
 ## Next (round one)
-1. **Floating panels (the foundation for the rest).** Small panels that float above everything, can be dragged and remember where they were, appear on every Space and over full-screen apps, and are switched on per mode.
-2. **Meeting mode: a floating notepad.** A notepad beside the call. What you type saves into Apple Notes as you type (one note per meeting). Apple Notes has no direct API, so this goes through scripting and needs a one-time macOS permission.
+1. **Floating panels** and 2. **Meeting notepad:** built, see above.
 3. **Music mode's floating player.** The Music mode now exists as a starter mode. Its player stays on top of every window, including full-screen apps, and controls the Music or Spotify app you already use. Spotify login for playlists comes later.
 4. **Deeper per-mode customisation.** Each mode gets its own list of components, each with its own settings, instead of one shared form. The two items above become components, along with the timer, priorities and sound.
 

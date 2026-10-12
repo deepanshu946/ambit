@@ -10,6 +10,7 @@ struct MenuBarView: View {
             header
             if model.activeMode != nil {
                 MenuRow(title: model.clock.isPaused ? "Resume" : "Pause", symbol: model.clock.isPaused ? "play.fill" : "pause.fill") { model.togglePause() }
+                if model.panels.hasNotepad { MenuRow(title: "Show notepad", symbol: "note.text") { model.panels.showNotepad() } }
                 MenuRow(title: "End session", symbol: "stop.fill") { model.end() }
             }
             Divider().padding(.vertical, 4)

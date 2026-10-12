@@ -12,11 +12,13 @@ final class AppModel {
     /// Something the person should know about, e.g. a wallpaper that couldn't be restored. Stays until dismissed.
     private(set) var notice: String?
     let effects: SystemEffects
+    let panels: SessionPanels
     /// A mode waiting for the person's OK before it changes the Mac for the first time (or after its changes were edited).
     private(set) var pendingReview: Mode?
     /// Set to jump the window to a mode (the review's "Edit mode" button). The window clears it.
     var selectionRequest: Mode.ID?
 
+    @ObservationIgnored private let upgradeStore: JSONStore<[String]>
     @ObservationIgnored private let modeStore: JSONStore<[Mode]>
     @ObservationIgnored private let historyStore: JSONStore<[SessionRecord]>
 
@@ -25,18 +27,27 @@ final class AppModel {
     @ObservationIgnored private var acknowledged: [String: String]     // mode id -> fingerprint of the changes the person approved
 
     init(effects: SystemEffects,
+         panels: SessionPanels = SessionPanels(),
+         upgradeStore: JSONStore<[String]> = .appSupport("applied-upgrades"),
          modeStore: JSONStore<[Mode]> = .appSupport("modes"),
          historyStore: JSONStore<[SessionRecord]> = .appSupport("history"),
          acknowledgementStore: JSONStore<[String: String]> = .appSupport("acknowledged")) {
         self.effects = effects
+        self.panels = panels
+        self.upgradeStore = upgradeStore
         self.modeStore = modeStore
         self.historyStore = historyStore
         self.acknowledgementStore = acknowledgementStore
         acknowledged = acknowledgementStore.load() ?? [:]
         let saved = modeStore.load()
-        let merged = saved.map(DefaultModes.addingMissing(to:)) ?? DefaultModes.all      // new starter modes appear for existing users
+        var merged = saved.map(DefaultModes.addingMissing(to:)) ?? DefaultModes.all      // new starter modes appear for existing users
+        // Features added to a starter mode later reach saved modes once; a new install already has them.
+        let applied = saved == nil ? PresetUpgrades.allIDs : Set(upgradeStore.load() ?? [])
+        let upgraded = PresetUpgrades.apply(to: merged, alreadyApplied: applied)
+        merged = upgraded.modes
         modes = merged
-        if let saved, merged.count != saved.count { try? modeStore.save(merged) }
+        if upgraded.applied != Set(upgradeStore.load() ?? []) { try? upgradeStore.save(upgraded.applied.sorted()) }
+        if let saved, merged != saved { try? modeStore.save(merged) }
         history = historyStore.load() ?? []
         effects.onNotice = { [weak self] text in
             guard let self else { return }
@@ -48,13 +59,18 @@ final class AppModel {
         Task { [weak self] in
             guard let self else { return }
             post(await effects.recoverFromCrash())
+            post(await panels.recoverUnsavedNotes())
         }
     }
 
     func dismissNotice() { notice = nil }
 
+    /// Adds lines to the banner, skipping any it already shows, so two sources can report at once.
     private func post(_ lines: [String]) {
-        if !lines.isEmpty { notice = lines.joined(separator: "\n") }
+        guard !lines.isEmpty else { return }
+        var shown = notice?.components(separatedBy: "\n") ?? []
+        for line in lines where !shown.contains(line) { shown.append(line) }
+        notice = shown.joined(separator: "\n")
     }
 
     var activeMode: Mode? { modes.first { $0.id == activeModeID } }
@@ -76,6 +92,12 @@ final class AppModel {
             try? acknowledgementStore.save(acknowledged)
         }
         finishSession(cancel: false)       // the Mac stays as is; the new mode decides what it should look like
+        let previousPanels = panels.leave()
+        Task { [weak self] in
+            let problems = await previousPanels.value
+            self?.post(problems)
+        }
+        panels.enter(mode)
         clock = SessionClock()
         clock.start(at: .now)
         activeModeID = id
@@ -107,24 +129,26 @@ final class AppModel {
 
     /// Completed = the user ended it; cancelled = the user discarded it. Neither can be recorded twice.
     func end(cancel: Bool = false) {
-        let leaving = beginEnding(cancel: cancel)       // the session ends right now, so an immediate start() can't be confused with it
+        let (leaving, panelsClosing) = beginEnding(cancel: cancel)       // the session ends right now, so an immediate start() can't be confused with it
         Task { [weak self] in
             guard let self else { return }
             post(await effects.leave(leaving))
+            post(await panelsClosing.value)
         }
     }
 
     /// Ends the session and waits for the desktop to be put back. Quitting awaits this.
     func endSession(cancel: Bool = false) async {
-        let leaving = beginEnding(cancel: cancel)
+        let (leaving, panelsClosing) = beginEnding(cancel: cancel)
         post(await effects.leave(leaving))
+        post(await panelsClosing.value)
     }
 
-    private func beginEnding(cancel: Bool) -> Mode? {
+    private func beginEnding(cancel: Bool) -> (Mode?, Task<[String], Never>) {
         let mode = activeMode
         finishSession(cancel: cancel)
         sessionToken = UUID()                           // a wallpaper download still in flight must not apply after this
-        return mode
+        return (mode, panels.leave())                   // panels close now; their notes finish saving in the task
     }
 
     private func finishSession(cancel: Bool) {

@@ -16,7 +16,7 @@ public enum DefaultModes {
         mode("00000000-0000-0000-0000-000000000005", "Chill", "Low. Work disappears, music takes over.",
              "moon.stars", .dark, RGB(1.00, 0.54, 0.40), [.sound], hide: chat, dock: true),
         mode("00000000-0000-0000-0000-000000000006", "Meeting", "Reactive. Only what the call needs.",
-             "video", .light, RGB(0.18, 0.71, 0.34), [.timer, .priorities, .quickNote], hide: ["com.tinyspeck.slackmacgap"]),
+             "video", .light, RGB(0.18, 0.71, 0.34), [.timer, .priorities, .quickNote, .notepad], hide: ["com.tinyspeck.slackmacgap"]),
         mode("00000000-0000-0000-0000-000000000007", "Creative", "Energetic. Big canvas, tools in reach.",
              "paintpalette", .dark, RGB(1.00, 0.31, 0.64), [.timer, .priorities, .sound, .quickNote], dock: true),
         mode("00000000-0000-0000-0000-000000000008", "Music", "Your music, always one glance away.",
