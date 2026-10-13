@@ -7,6 +7,7 @@ import AmbitCore
 ///   AMBIT_SELECT=<index|history>  start on that sidebar item
 ///   AMBIT_SIZE=1100x2200          resize the window first (to see a long form in one shot)
 ///   AMBIT_SCROLL=<points>         scroll the main form down this far before the snapshot
+///   AMBIT_DUMP=/path/out.txt     write the window's view tree (classes, sizes, hidden, table rows, text) and quit
 ///   AMBIT_APPEARANCE=dark|light   force the appearance
 enum DebugHooks {
     /// AMBIT_SELFTEST=wallpaper|apps|events: drives real sessions against the real Mac and checks it after each step.
@@ -161,6 +162,27 @@ enum DebugHooks {
         case "dark": NSApp.appearance = NSAppearance(named: .darkAqua)
         case "light": NSApp.appearance = NSAppearance(named: .aqua)
         default: break
+        }
+        if let dumpPath = env["AMBIT_DUMP"] {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                var out = ""
+                @MainActor func walk(_ v: NSView, _ depth: Int) {
+                    var line = String(repeating: "  ", count: depth) + "\(type(of: v)) frame=\(Int(v.frame.minX)),\(Int(v.frame.minY)) \(Int(v.frame.width))x\(Int(v.frame.height))"
+                    if v.isHidden { line += " HIDDEN" }
+                    if v.alphaValue < 1 { line += " alpha=\(v.alphaValue)" }
+                    if let t = v as? NSTableView { line += " rows=\(t.numberOfRows) visibleRect=\(Int(t.visibleRect.width))x\(Int(t.visibleRect.height))" }
+                    if let t = v as? NSTextField, !t.stringValue.isEmpty { line += " text=\"\(t.stringValue)\" color=\(t.textColor?.description ?? "nil")" }
+                    out += line + "\n"
+                    v.subviews.forEach { walk($0, depth + 1) }
+                }
+                for w in NSApp.windows where w.isVisible && w.styleMask.contains(.titled) {
+                    out += "WINDOW \(w.title) frame=\(w.frame) appearance=\(w.effectiveAppearance.name.rawValue)\n"
+                    if let root = w.contentView?.superview { walk(root, 0) }
+                }
+                try? out.write(toFile: dumpPath, atomically: true, encoding: .utf8)
+                NSApp.terminate(nil)
+            }
+            return
         }
         guard let path = env["AMBIT_SNAPSHOT"] else { return }
         if let size = env["AMBIT_SIZE"]?.split(separator: "x").compactMap({ Double($0) }), size.count == 2 {
