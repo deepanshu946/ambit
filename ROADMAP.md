@@ -37,6 +37,12 @@ We go around the modes in turns. Each turn picks one mode, adds one or two featu
 - No app icon, the bundle identifier is a placeholder, and there is no licence or release pipeline.
 - Window tiling and the macOS accent colour are not implemented.
 
+## Open issues (start the next chat here)
+1. **Sidebar goes blank after starting or switching to a mode** (reported with screenshots; fine on launch). Not reproduced here, and the window's structure looked correct with the owner's real modes. Changes made to remove the likely causes, **not yet re-tested by the owner**: sidebar rows now keep one fixed shape with a system "On" badge, the first-start review sheet is attached to the detail column instead of the whole split view, and each mode's screen is rebuilt fresh. If it is still blank: try a plain sidebar list style without the glass material, and look at whether the Meeting notepad panel or the review sheet is the trigger (the debug build's `AMBIT_DUMP=/path/out.txt` lists the window's views).
+2. Always-visible fat scroll bars in screenshots are the Mac's own setting (System Settings > Appearance > Show scroll bars), not Ambit.
+3. Meeting notepad is built but unverified in the real app: typing without leaving the call app, appearing over full-screen apps, the Notes permission, and a new note per session.
+4. Dock/appearance, hide apps, volume and Focus effects are built and were live-tested only for hide apps, volume, Dock and appearance. Focus needs the owner's own shortcuts.
+
 ## Round one, in progress: Meeting
 **Built, waiting for the owner's test:** the floating panel foundation (a draggable panel that floats above windows, follows you across Spaces, tries to sit over full-screen apps, and remembers where you left it) and the Meeting notepad on top of it. The notepad opens docked at the right edge when Meeting starts, can be switched on or off per mode in the editor, and saves into a new note per session in the "Ambit Meetings" folder in Notes (the folder is editable per mode). Text is kept in a local draft until Notes has it, and a draft left by a crash is saved at the next launch. Features added to a starter mode after release reach already-saved modes once (`PresetUpgrades`), so a later "off" is never undone.
 

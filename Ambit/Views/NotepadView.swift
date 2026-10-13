@@ -13,6 +13,7 @@ struct NotepadView: View {
             TextEditor(text: $model.text)
                 .font(.body)
                 .scrollContentBackground(.hidden)
+                .scrollIndicators(.never)
                 .padding(6)
                 .background(.quaternary.opacity(0.5), in: .rect(cornerRadius: 8, style: .continuous))
                 .overlay(alignment: .topLeading) {

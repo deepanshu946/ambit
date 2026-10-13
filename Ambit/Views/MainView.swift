@@ -27,19 +27,12 @@ struct MainView: View {
             List(selection: $selection) {
                 Section("Modes") {
                     ForEach(model.modes) { mode in
-                        HStack {
-                            Label {
-                                Text(mode.name)
-                            } icon: {
-                                Image(systemName: mode.symbol).foregroundStyle(mode.look.accent.map(Color.init) ?? Color.secondary)
-                            }
-                            Spacer()
-                            if model.activeModeID == mode.id {
-                                Image(systemName: model.clock.isPaused ? "pause.circle.fill" : "waveform")
-                                    .foregroundStyle(.secondary)
-                                    .accessibilityLabel(model.clock.isPaused ? "Paused" : "Session running")
-                            }
+                        Label {
+                            Text(mode.name)
+                        } icon: {
+                            Image(systemName: mode.symbol).foregroundStyle(mode.look.accent.map(Color.init) ?? Color.secondary)
                         }
+                        .badge(badge(for: mode))
                         .tag(SidebarItem.mode(mode.id))
                     }
                 }
@@ -51,9 +44,9 @@ struct MainView: View {
         } detail: {
             detail
                 .safeAreaInset(edge: .top, spacing: 0) { NoticeBanner() }
-        }
-        .sheet(item: Binding(get: { model.pendingReview }, set: { if $0 == nil { model.cancelReview() } })) { mode in
-            ReviewSheet(mode: mode)
+                .sheet(item: Binding(get: { model.pendingReview }, set: { if $0 == nil { model.cancelReview() } })) { mode in
+                    ReviewSheet(mode: mode)
+                }
         }
         .onChange(of: model.selectionRequest) { _, id in
             if let id { selection = .mode(id); model.selectionRequest = nil }     // the review's "Edit mode"
@@ -67,12 +60,19 @@ struct MainView: View {
         }
     }
 
+    /// "On" while that mode's session runs. A system badge keeps the row's shape the same whether or not a session is running.
+    private func badge(for mode: Mode) -> Text? {
+        guard model.activeModeID == mode.id else { return nil }
+        return Text(model.clock.isPaused ? "Paused" : "On")
+    }
+
     @ViewBuilder private var detail: some View {
             switch selection {
             case .mode(let id):
                 if let index = model.modes.firstIndex(where: { $0.id == id }) {
                     @Bindable var model = model
                     ModeDetailView(mode: $model.modes[index])
+                        .id(id)
                 }
             case .history:
                 HistoryView()

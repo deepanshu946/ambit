@@ -89,6 +89,7 @@ struct ModeDetailView: View {
             }
         }
         .formStyle(.grouped)
+        .scrollEdgeEffectStyle(.soft, for: .top)
         .navigationTitle(mode.name)
     }
 
