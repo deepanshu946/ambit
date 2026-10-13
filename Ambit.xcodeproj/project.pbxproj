@@ -9,12 +9,14 @@
 /* Begin PBXBuildFile section */
 		F10A00000000000000000004 /* AmbitCore in Frameworks */ = {isa = PBXBuildFile; productRef = F10A00000000000000000003 /* AmbitCore */; };
 		F10A0000000000000000001F /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = F10A0000000000000000001E /* manifest.json */; };
+		F10A00000000000000000101 /* thumbs in Resources */ = {isa = PBXBuildFile; fileRef = F10A00000000000000000100 /* thumbs */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		F10A00000000000000000001 /* Ambit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Ambit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F10A0000000000000000001E /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = Wallpapers/manifest.json; sourceTree = "<group>"; };
 		F10A00000000000000000020 /* Ambit.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Ambit.entitlements; path = Config/Ambit.entitlements; sourceTree = "<group>"; };
+		F10A00000000000000000100 /* thumbs */ = {isa = PBXFileReference; lastKnownFileType = folder; name = thumbs; path = Wallpapers/thumbs; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -42,6 +44,7 @@
 			children = (
 				F10A0000000000000000000A /* Ambit */,
 				F10A0000000000000000001E /* manifest.json */,
+				F10A00000000000000000100 /* thumbs */,
 				F10A00000000000000000020 /* Ambit.entitlements */,
 				F10A0000000000000000000E /* Products */,
 			);
@@ -124,6 +127,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F10A0000000000000000001F /* manifest.json in Resources */,
+				F10A00000000000000000101 /* thumbs in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

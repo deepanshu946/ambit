@@ -89,9 +89,7 @@ struct ModeDetailView: View {
             }
         }
         .formStyle(.grouped)
-        .tint(mode.look.accent.map(Color.init))
-        .navigationTitle(mode.name)              // still the window's name for VoiceOver and the Window menu
-        .toolbar(removing: .title)               // the hero already shows it; a second, differently aligned copy only adds noise
+        .navigationTitle(mode.name)
     }
 
     private enum DockChoice: Hashable { case leave, hide, show }

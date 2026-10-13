@@ -40,11 +40,16 @@ final class WallpaperLibrary {
     func entry(_ id: String) -> WallpaperEntry? { entries.first { $0.id == id } }
     func state(_ id: String) -> State { states[id] ?? .missing }
 
-    /// The image to preview for a mode, or nil if it isn't on disk yet.
+    /// A small preview shipped inside the app, so a wallpaper shows a real picture before it is downloaded.
+    func thumbnailURL(_ id: String) -> URL? {
+        Bundle.main.url(forResource: id, withExtension: "jpg", subdirectory: "thumbs")
+    }
+
+    /// The image to show for a mode: the full picture once downloaded, otherwise the bundled preview.
     func imageURL(for setting: WallpaperSetting) -> URL? {
         switch setting {
         case .keep: nil
-        case .bundled(let id): state(id) == .ready ? fileURL(id) : nil
+        case .bundled(let id): state(id) == .ready ? fileURL(id) : thumbnailURL(id)
         case .file(let path): URL(filePath: path)
         }
     }

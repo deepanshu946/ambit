@@ -1,7 +1,7 @@
 # Wallpaper credits
 
 Wallpapers are downloaded from Wikimedia Commons by `fetch.py`; they are not part of this repository.
-Each image keeps its own license. CC0 and public-domain images need no attribution; it is listed anyway. CC BY images require the credit below.
+Small preview thumbnails in `Wallpapers/thumbs/` are resized copies of these images and carry the same licence and credit. Each image keeps its own license. CC0 and public-domain images need no attribution; it is listed anyway. CC BY images require the credit below.
 
 | Mode | Image | Author | License |
 |---|---|---|---|

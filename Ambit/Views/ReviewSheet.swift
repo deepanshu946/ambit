@@ -36,6 +36,5 @@ struct ReviewSheet: View {
         }
         .padding(24)
         .frame(width: 460)
-        .tint(mode.look.accent.map(Color.init))
     }
 }

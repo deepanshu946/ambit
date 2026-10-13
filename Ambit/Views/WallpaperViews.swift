@@ -114,9 +114,9 @@ private struct WallpaperTile: View {
     var body: some View {
         let state = library.state(entry.id)
         Button(action: action) {
-            WallpaperThumb(url: state == .ready ? library.fileURL(entry.id) : nil, maxPixel: 520)
+            WallpaperThumb(url: library.thumbnailURL(entry.id) ?? (state == .ready ? library.fileURL(entry.id) : nil), maxPixel: 560)
                 .aspectRatio(16 / 10, contentMode: .fit)
-                .overlay { if state != .ready { downloadBadge(state) } }
+                .overlay(alignment: .bottomTrailing) { if state != .ready { badge(state) } }
                 .clipShape(tileShape)
                 .overlay { tileShape.strokeBorder(selected ? AnyShapeStyle(.tint) : AnyShapeStyle(.clear), lineWidth: 3) }
                 .overlay(alignment: .topTrailing) {
@@ -137,23 +137,24 @@ private struct WallpaperTile: View {
         .accessibilityAddTraits(selected ? .isSelected : [])
     }
 
-    private func downloadBadge(_ state: WallpaperLibrary.State) -> some View {
-        ZStack {
-            Rectangle().fill(.black.opacity(0.4))
-            VStack(spacing: 4) {
-                if state == .downloading {
-                    ProgressView().controlSize(.small).tint(.white)
-                    Text("Downloading").font(.caption)
-                } else {
-                    Image(systemName: "arrow.down.circle.fill").font(.title2)
-                    Text("\(Int(entry.megabytes.rounded())) MB").font(.caption)
-                }
-                if library.errors[entry.id] != nil {
-                    Text("Failed. Click to retry.").font(.caption2)
-                }
+    /// The picture is always visible; this small label says a click downloads it first.
+    private func badge(_ state: WallpaperLibrary.State) -> some View {
+        HStack(spacing: 4) {
+            if state == .downloading {
+                ProgressView().controlSize(.mini)
+                Text("Downloading")
+            } else if library.errors[entry.id] != nil {
+                Image(systemName: "exclamationmark.arrow.triangle.2.circlepath")
+                Text("Retry")
+            } else {
+                Image(systemName: "arrow.down.circle.fill")
+                Text("\(Int(entry.megabytes.rounded())) MB")
             }
-            .foregroundStyle(.white)
         }
+        .font(.caption.weight(.medium))
+        .padding(.horizontal, 8).padding(.vertical, 4)
+        .background(.ultraThinMaterial, in: .capsule)
+        .padding(6)
     }
 }
 
